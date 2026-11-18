@@ -2,6 +2,10 @@ name: Playwright Tests
 on:
   push:
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * *'   # 8pm UK during BST
+    - cron: '0 20 * * *'   # 8pm UK during GMT
 
 permissions:
   contents: read
@@ -9,7 +13,22 @@ permissions:
   id-token: write
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Europe/London date +%H)" != "20" ]; then
+            echo "run=false" >> $GITHUB_OUTPUT
+          else
+            echo "run=true" >> $GITHUB_OUTPUT
+          fi
+
   test:
+    needs: check
+    if: needs.check.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +61,7 @@ jobs:
 
   deploy:
     needs: test
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    if: ${{ !cancelled() && needs.test.result != 'skipped' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
