@@ -21,3 +21,4 @@ saved authentication state, cookie based session injection, and network control.
     tests/ui       login, inventory, cart, checkout
     tests/hybrid   cookie session, API and network tests
     tests/auth.setup.ts   logs in once and stores session
+[View the latest Allure report](https://benzx21.github.io/Saucedemo-playwright/)
