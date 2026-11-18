@@ -10,7 +10,7 @@ export const users = {
 } as const;
 
 export const checkoutInfo = {
-  firstName: 'Benson',
+  firstName: 'Benson1',
   lastName: 'Tester',
   postalCode: 'M1 1AA',
 };
